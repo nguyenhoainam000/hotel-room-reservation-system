@@ -21,27 +21,46 @@ A modular, enterprise-grade Hotel Room Reservation System developed using Agile/
 
 ---
 
-## 📋 Project Backlog & Sprint Management
+## 📋 Project Backlog & Assigned User Stories
 Project backlog, user story tracking, and iteration progress are managed on GitHub Projects:  
 🔗 **[Backlog · Room Reservation System for a Hotel](https://github.com/users/ColeDakota/projects/1/views/1)**
 
-### Core User Stories & Features:
-* **UC-1: Book Rooms for Guests:** Allows guests to reserve available rooms with validation.
-* **UC-2: View Room Availability:** Real-time visibility into room vacancy and status.
-* **UC-3: Room Preparation & Cleaning Alert:** Automated notification workflow for housekeeping when rooms require turnover.
-* **UC-4: Room Selection by Size & Location:** Filters rooms by capacity, room type, and floor/wing.
-* **UC-5: Cancel Room Reservations:** Handles booking cancellations and frees rooms back into inventory.
-* **UC-6: Update Room Status:** Administrative controls for room maintenance and readiness.
-* **UC-7: Generate Room Status Reports:** Management reporting and occupancy metrics.
+### Assigned Scope (Developer 2 - Quoc Nguyen / `nguyenhoainam000`):
+* ✅ **UC-1: View Room Availability:** Real-time visibility into room vacancy and status (`AVAILABLE`, `BOOKED`, `CLEANING`, `OUT_OF_SERVICE`).
+* ✅ **UC-3: Book Rooms for Guests (Create Reservation):** Reserves available rooms, calculates total stay cost based on nightly rates, assigns confirmation numbers, updates room status to `BOOKED`, and validates input (rejects blank guest names per Sequence Diagram Alternate Flow 5a).
+* ✅ **UC-5: Room Preparation & Cleaning Alert (Update Room Status):** Housekeeping workflow to trigger cleaning alerts on turnover, setting room to `CLEANING` (making it unbookable), and restoring to `AVAILABLE` once inspected and prepared.
+
+### Team Backlog User Stories (Other Members):
+* **UC-2: Search Rooms by Type and Location** (Developer 1)
+* **UC-4: Cancel Reservation** (Developer 1 / Developer 3)
+* **UC-6: Generate Room Status Report** (Developer 3)
+
+---
+
+## 🏛️ Domain Architecture & Design Conformance
+The implementation strictly conforms to the UML design specifications (`full_class_diagram.txt` and `sequence_diagram.txt`):
+
+* **Enums:**
+  * `Location`: `POOL_SIDE`, `BALCONY`, `STANDARD`
+  * `RoomStatus`: `AVAILABLE`, `BOOKED`, `CLEANING`, `OUT_OF_SERVICE`
+* **Domain Models:**
+  * `Hotel`: Manages hotel details and room inventory (`addRoom`, `getRoom`).
+  * `Room`: Represents rooms with status, type, and location (`updateStatus`, `isAvailable`, `isReadyForGuest`).
+  * `RoomType`: Defines room category, bed size, and nightly rate (`getNightlyRate`, `getBedSize`).
+  * `Guest`: Encapsulates guest profile (`getName`, `getPhone`) with validation.
+  * `Reservation`: Encapsulates confirmed bookings, dates, and cost (`calculateTotalCost`, `cancelReservation`).
+* **Controllers & Services:**
+  * `HotelController`: Orchestrates operations between UI and domain models per UML class diagram.
+  * `HotelReservationService`: Service facade providing business workflows and backwards-compatible APIs.
 
 ---
 
 ## 🏗️ Architecture & Tech Stack
 * **Language:** Java 17 LTS
 * **Build Tool:** Apache Maven
-* **Testing:** JUnit 5 (Jupiter)
+* **Testing:** JUnit 5 (Jupiter) with parameterized tests & alternate flow coverage
 * **CI/CD:** GitHub Actions (`actions/checkout@v5`, `actions/setup-java@v5`)
-* **Design Patterns:** Service Layer, Separation of Concerns (Model - Service)
+* **Design Patterns:** Controller / Service Layer, Separation of Concerns (Model - Controller - Service)
 
 ---
 
@@ -62,8 +81,8 @@ cd hotel-room-reservation-system
 # Compile and run all unit tests
 mvn clean test
 
-# Package the project
-mvn clean package
+# Run demo application
+mvn compile exec:java -Dexec.mainClass="org.example.Main"
 ```
 
 ---
