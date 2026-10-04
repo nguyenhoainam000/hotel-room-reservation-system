@@ -196,4 +196,110 @@ public class HotelReservationServiceTest {
         assertEquals(RoomStatus.AVAILABLE, hotel.getRoom("101").getStatus());
         assertTrue(service.viewRoomAvailability("101"));
     }
+
+    /**
+     * UC-4: Cancel Room Reservations
+     */
+    void testCancelReservationByConfirmationNumber() {
+        Guest guest = new Guest("Test Guest", "555-111-2222");
+        Room room = hotel.getRoom("101");
+
+        Reservation reservation = controller.createReservation(
+                guest,
+                room,
+                LocalDate.now(),
+                LocalDate.now().plusDays(2)
+        );
+
+        assertEquals(RoomStatus.BOOKED, room.getStatus());
+
+        boolean cancelled =
+                controller.cancelReservation(reservation.getConfirmationNumber());
+
+        assertTrue(cancelled);
+        assertEquals(RoomStatus.AVAILABLE, room.getStatus());
+        assertNull(room.getGuestName());
+    }
+    /**
+     * UC-4: Cancel Room Reservations
+     */
+    @Test
+    @DisplayName("UC-4 Test 1: Cancel reservation by confirmation number")
+    void testCancelReservationByConfirmationNumber1() {
+        Guest guest = new Guest("Test Guest", "555-111-2222");
+        Room room = hotel.getRoom("101");
+
+        Reservation reservation = controller.createReservation(
+                guest,
+                room,
+                LocalDate.now(),
+                LocalDate.now().plusDays(2)
+        );
+
+        assertEquals(RoomStatus.BOOKED, room.getStatus());
+
+        boolean cancelled =
+                controller.cancelReservation(reservation.getConfirmationNumber());
+
+        assertTrue(cancelled);
+        assertEquals(RoomStatus.AVAILABLE, room.getStatus());
+        assertNull(room.getGuestName());
+    }
+
+    @Test
+    @DisplayName("UC-4 Test 2: Cancel reservation by room number")
+    void testCancelReservationByRoomNumber() {
+        Guest guest = new Guest("Test Guest", "555-111-2222");
+        Room room = hotel.getRoom("102");
+
+        controller.createReservation(
+                guest,
+                room,
+                LocalDate.now(),
+                LocalDate.now().plusDays(2)
+        );
+
+        assertEquals(RoomStatus.BOOKED, room.getStatus());
+
+        boolean cancelled = controller.cancelReservationByRoom("102");
+
+        assertTrue(cancelled);
+        assertEquals(RoomStatus.AVAILABLE, room.getStatus());
+        assertNull(room.getGuestName());
+
+        assertFalse(controller.cancelReservationByRoom("999"));
+    }/**
+     * UC-6: Generate Room Status Reports
+     */
+    @Test
+    @DisplayName("UC-6 Test 1: Generate accurate room status totals")
+    void testGenerateRoomStatusReportCounts() {
+        hotel.getRoom("101").updateStatus(RoomStatus.BOOKED);
+        hotel.getRoom("102").updateStatus(RoomStatus.CLEANING);
+        hotel.getRoom("103").updateStatus(RoomStatus.AVAILABLE);
+
+        String report = controller.generateRoomStatusReport();
+
+        assertTrue(report.contains("Total Rooms: 3"));
+        assertTrue(report.contains("Available Rooms: 1"));
+        assertTrue(report.contains("Booked Rooms: 1"));
+        assertTrue(report.contains("Cleaning Rooms: 1"));
+        assertTrue(report.contains("Out of Service Rooms: 0"));
+    }
+
+    @Test
+    @DisplayName("UC-6 Test 2: Calculate occupancy rate and format report")
+    void testGenerateRoomStatusReportOccupancyRate() {
+        hotel.getRoom("101").updateStatus(RoomStatus.BOOKED);
+        hotel.getRoom("102").updateStatus(RoomStatus.AVAILABLE);
+        hotel.getRoom("103").updateStatus(RoomStatus.AVAILABLE);
+
+        String report = controller.generateRoomStatusReport();
+
+        assertTrue(report.contains("=== Room Status Report ==="));
+        assertTrue(report.contains("Occupancy Rate: 33.33%"));
+        assertTrue(report.contains("Room 101"));
+        assertTrue(report.contains("Room 102"));
+        assertTrue(report.contains("Room 103"));
+    }
 }

@@ -108,7 +108,27 @@ public class HotelController {
         }
         return false;
     }
+    /**
+     * UC-4: Cancel Reservation by room number.
+     * Locates an existing reservation using the room ID
+     * and releases the room back to available inventory.
+     */
+    public boolean cancelReservationByRoom(String roomNumber) {
+        if (roomNumber == null || roomNumber.trim().isEmpty()) {
+            return false;
+        }
 
+        for (Reservation res : reservations) {
+            if (res.getRoom() != null &&
+                    res.getRoom().getRoomNumber().equalsIgnoreCase(roomNumber)) {
+
+                res.cancelReservation();
+                return true;
+            }
+        }
+
+        return false;
+    }
     /**
      * UC-5: Update Room Status (Room Preparation and Cleaning Alert)
      * Allows Housekeeping or Front Desk Clerk to update room status.
@@ -149,19 +169,67 @@ public class HotelController {
         return false;
     }
 
-    /**
-     * UC-6: Generate Room Status Report
-     */
-    public String generateRoomStatusReport() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== Room Status Report ===\n");
-        for (Room r : hotel.getRooms()) {
-            sb.append(String.format("Room %s [%s] - Status: %s - Type: %s\n",
-                    r.getRoomNumber(),
-                    r.getLocation(),
-                    r.getStatus(),
-                    (r.getRoomType() != null ? r.getRoomType().getName() : "N/A")));
-        }
-        return sb.toString();
+public String generateRoomStatusReport() {
+    	    int totalRooms = hotel.getRooms().size();
+    	    int availableRooms = 0;
+    	    int bookedRooms = 0;
+    	    int cleaningRooms = 0;
+    	    int outOfServiceRooms = 0;
+
+    	    for (Room room : hotel.getRooms()) {
+    	        switch (room.getStatus()) {
+    	            case AVAILABLE:
+    	                availableRooms++;
+    	                break;
+
+    	            case BOOKED:
+    	                bookedRooms++;
+    	                break;
+
+    	            case CLEANING:
+    	                cleaningRooms++;
+    	                break;
+
+    	            case OUT_OF_SERVICE:
+    	                outOfServiceRooms++;
+    	                break;
+    	        }
+    	    }
+
+    	    double occupancyRate =
+    	            totalRooms == 0
+    	                    ? 0.0
+    	                    : ((double) bookedRooms / totalRooms) * 100.0;
+
+    	    StringBuilder sb = new StringBuilder();
+
+    	    sb.append("=== Room Status Report ===\n");
+    	    sb.append("Total Rooms: ").append(totalRooms).append("\n");
+    	    sb.append("Available Rooms: ").append(availableRooms).append("\n");
+    	    sb.append("Booked Rooms: ").append(bookedRooms).append("\n");
+    	    sb.append("Cleaning Rooms: ").append(cleaningRooms).append("\n");
+    	    sb.append("Out of Service Rooms: ")
+    	            .append(outOfServiceRooms).append("\n");
+
+    	    sb.append(String.format(
+    	            "Occupancy Rate: %.2f%%%n",
+    	            occupancyRate
+    	    ));
+
+    	    sb.append("\nRoom Details:\n");
+
+    	    for (Room room : hotel.getRooms()) {
+    	        sb.append(String.format(
+    	                "Room %s [%s] - Status: %s - Type: %s%n",
+    	                room.getRoomNumber(),
+    	                room.getLocation(),
+    	                room.getStatus(),
+    	                room.getRoomType() != null
+    	                        ? room.getRoomType().getName()
+    	                        : "N/A"
+    	        ));
+    	    }
+
+    	    return sb.toString();
+    	}
     }
-}

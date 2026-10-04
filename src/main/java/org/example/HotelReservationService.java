@@ -102,4 +102,24 @@ public class HotelReservationService {
     public void updateRoomStatus(String roomId, RoomStatus status) {
         controller.updateRoomStatus(roomId, status);
     }
+    /**
+     * UC-4: Cancels a reservation using its confirmation number.
+     */
+    public boolean cancelReservation(String confirmationNumber) {
+        return controller.cancelReservation(confirmationNumber);
+    }
+
+    /**
+     * UC-4: Cancels a reservation using its room number.
+     */
+    public boolean cancelReservationByRoom(String roomNumber) {
+        return controller.cancelReservationByRoom(roomNumber);
+    }
+
+    /**
+     * UC-6: Generates a consolidated room status report.
+     */
+    public String generateRoomStatusReport() {
+        return controller.generateRoomStatusReport();
+    }
 }
