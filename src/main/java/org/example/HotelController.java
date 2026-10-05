@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -162,6 +163,21 @@ public class HotelController {
                     r.getStatus(),
                     (r.getRoomType() != null ? r.getRoomType().getName() : "N/A")));
         }
+
+        int total = hotel.getRooms().size();
+        long occupied = countRoomsWithStatus(RoomStatus.BOOKED);
+        double occupancyRate = total == 0 ? 0.0 : occupied * 100.0 / total;
+
+        sb.append("--- Summary ---\n");
+        sb.append(String.format("Total Rooms: %d\n", total));
+        sb.append(String.format("Occupied Rooms: %d\n", occupied));
+        sb.append(String.format("Vacant Rooms: %d\n", countRoomsWithStatus(RoomStatus.AVAILABLE)));
+        sb.append(String.format("Rooms Under Cleaning: %d\n", countRoomsWithStatus(RoomStatus.CLEANING)));
+        sb.append(String.format(Locale.US, "Occupancy Rate: %.1f%%\n", occupancyRate));
         return sb.toString();
+    }
+
+    private long countRoomsWithStatus(RoomStatus status) {
+        return hotel.getRooms().stream().filter(r -> r.getStatus() == status).count();
     }
 }
