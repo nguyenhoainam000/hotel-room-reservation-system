@@ -49,6 +49,36 @@ public class HotelReservationServiceTest {
         assertTrue(controller.viewRoomAvailability("102"), "Room 102 should report available");
     }
 
+    /**
+     * UC-2: Search Rooms by Type and Location
+     */
+    @Test
+    @DisplayName("UC-2 Test 1: Match both room type and location")
+    void testSearchRoomsByTypeAndLocation() {
+        List<Room> results = service.searchRooms("Deluxe", "POOL_SIDE");
+
+        assertEquals(1, results.size());
+        assertEquals("102", results.get(0).getRoomNumber());
+    }
+
+    @Test
+    @DisplayName("UC-2 Test 2: Blank location matches any location")
+    void testSearchRoomsByTypeWithAnyLocation() {
+        List<Room> results = service.searchRooms("Deluxe", "");
+
+        assertEquals(2, results.size());
+        assertTrue(results.stream()
+                .allMatch(room -> room.getRoomType().getName().equals("Deluxe")));
+    }
+
+    @Test
+    @DisplayName("UC-2 Test 3: No matching rooms returns an empty list")
+    void testSearchRoomsWithNoMatches() {
+        List<Room> results = service.searchRooms("Standard", "BALCONY");
+
+        assertTrue(results.isEmpty());
+    }
+
     @Test
     @DisplayName("UC-1 Test 2: Room isReadyForGuest and isAvailable state transitions")
     void testRoomAvailabilityStates() {
@@ -144,6 +174,33 @@ public class HotelReservationServiceTest {
     }
 
     /**
+     * UC-4: Cancel Reservation
+     */
+    @Test
+    @DisplayName("UC-4 Test 1: Cancel active reservation releases room to available")
+    void testCancelReservationSuccess() {
+        Guest guest = new Guest("David Miller", "555-123-4567");
+        Room room = hotel.getRoom("101");
+        LocalDate checkIn = LocalDate.now();
+        LocalDate checkOut = checkIn.plusDays(2);
+
+        Reservation res = service.createReservation(guest, room, checkIn, checkOut);
+        assertEquals(RoomStatus.BOOKED, room.getStatus());
+        assertFalse(room.isAvailable());
+
+        // Cancel reservation
+        boolean cancelled = service.cancelReservation(res.getConfirmationNumber());
+        assertTrue(cancelled, "Cancellation should succeed for valid confirmation code");
+        assertEquals(RoomStatus.AVAILABLE, room.getStatus(), "Room status should return to AVAILABLE");
+        assertTrue(room.isAvailable(), "Room should be available after cancellation");
+        assertNull(room.getGuestName(), "Guest name should be cleared upon cancellation");
+
+        // Cancel non-existent reservation
+        boolean secondCancel = service.cancelReservation("INVALID-CODE-999");
+        assertFalse(secondCancel, "Cancelling non-existent code should return false");
+    }
+
+    /**
      * UC-5: Room Preparation and Cleaning Alert (Update Room Status)
      */
     @Test
@@ -175,6 +232,21 @@ public class HotelReservationServiceTest {
         controller.updateRoomStatus("103", RoomStatus.AVAILABLE);
         assertEquals(RoomStatus.AVAILABLE, hotel.getRoom("103").getStatus());
         assertTrue(hotel.getRoom("103").isAvailable());
+    }
+
+    /**
+     * UC-6: Generate Room Status Report
+     */
+    @Test
+    @DisplayName("UC-6 Test 1: Generate room status report produces accurate inventory summary")
+    void testGenerateRoomStatusReport() {
+        String report = service.generateRoomStatusReport();
+
+        assertNotNull(report, "Status report should not be null");
+        assertTrue(report.contains("Room Status Report"), "Report should contain header");
+        assertTrue(report.contains("101"), "Report should contain Room 101");
+        assertTrue(report.contains("102"), "Report should contain Room 102");
+        assertTrue(report.contains("103"), "Report should contain Room 103");
     }
 
     /**

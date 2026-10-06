@@ -54,6 +54,14 @@ public class HotelReservationService {
     }
 
     /**
+     * UC-2: Search rooms by type and location.
+     * Pass null or blank for either criterion to match any value.
+     */
+    public List<Room> searchRooms(String type, String location) {
+        return controller.searchRooms(type, location);
+    }
+  
+    /**
      * User Story: Book Rooms for Guests
      * Reserves a room for a specific guest.
      * Throws IllegalArgumentException if guestName is blank.
@@ -82,6 +90,14 @@ public class HotelReservationService {
     }
 
     /**
+     * User Story: Cancel Reservation (UC-4)
+     * Cancels an existing reservation by confirmation number and releases the room.
+     */
+    public boolean cancelReservation(String confirmationNumber) {
+        return controller.cancelReservation(confirmationNumber);
+    }
+
+    /**
      * User Story: Room Preparation and Cleaning Alert
      * Triggers a cleaning alert when a guest checks out or room needs preparation.
      */
@@ -101,5 +117,13 @@ public class HotelReservationService {
      */
     public void updateRoomStatus(String roomId, RoomStatus status) {
         controller.updateRoomStatus(roomId, status);
+    }
+
+    /**
+     * User Story: Generate Room Status Report (UC-6)
+     * Produces a formatted status report for all rooms.
+     */
+    public String generateRoomStatusReport() {
+        return controller.generateRoomStatusReport();
     }
 }
