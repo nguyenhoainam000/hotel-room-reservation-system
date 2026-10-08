@@ -25,15 +25,15 @@ A modular, enterprise-grade Hotel Room Reservation System developed using Agile/
 Project backlog, user story tracking, and iteration progress are managed on GitHub Projects:  
 🔗 *[Backlog · Room Reservation System for a Hotel](https://github.com/users/ColeDakota/projects/1/views/1)*
 
-### Assigned Scope (Developer 2 - Quoc Nguyen / nguyenhoainam000):
-* ✅ *UC-1: View Room Availability:* Real-time visibility into room vacancy and status (AVAILABLE, BOOKED, CLEANING, OUT_OF_SERVICE).
-* ✅ *UC-3: Book Rooms for Guests (Create Reservation):* Reserves available rooms, calculates total stay cost based on nightly rates, assigns confirmation numbers, updates room status to BOOKED, and validates input (rejects blank guest names per Sequence Diagram Alternate Flow 5a).
-* ✅ *UC-5: Room Preparation & Cleaning Alert (Update Room Status):* Housekeeping workflow to trigger cleaning alerts on turnover, setting room to CLEANING (making it unbookable), and restoring to AVAILABLE once inspected and prepared.
-
-### Team Backlog User Stories (Other Members):
-* *UC-2: Search Rooms by Type and Location* (Developer 1)
-* *UC-4: Cancel Reservation* (Developer 1 / Developer 3)
-* *UC-6: Generate Room Status Report* (Developer 3)
+### Scope Delivered (Developer 2 - Quoc Nguyen / `nguyenhoainam000`):
+* ✅ **UC-1: View Room Availability:** Real-time visibility into room vacancy and status (`AVAILABLE`, `BOOKED`, `CLEANING`, `OUT_OF_SERVICE`).
+* ✅ **UC-2: Room Selection by Size and Location:** Multi-criteria room search with wildcard/blank parameter handling and availability filtering.
+* ✅ **UC-3: Book Rooms for Guests (Create Reservation):** Reserves available rooms, calculates total stay cost based on nightly rates, assigns confirmation numbers, updates room status to `BOOKED`, and validates input (rejects blank guest names per Sequence Diagram Alternate Flow 5a).
+* ✅ **UC-4: Cancel Room Reservations:** Cancels bookings by confirmation number, transitions reservation to `CANCELLED`, releases room back to `AVAILABLE`, and handles Alternate Flow 4a (invalid confirmation number).
+* ✅ **UC-5: Room Preparation & Cleaning Alert (Update Room Status):** Housekeeping workflow to trigger cleaning alerts on turnover, setting room to `CLEANING` (making it unbookable), and restoring to `AVAILABLE` once inspected and prepared.
+* ✅ **UC-6: Generate Room Status Report:** Consolidates hotel room inventory, calculates occupancy rates, room vacancy counts, and outputs formatted management reports.
+* ✅ **Interactive Console Action Menu:** CLI interface supporting 8 operations and automated demo sequence (`Main.java`).
+* ✅ **Automated Unit Testing & CI:** 20 test cases covering UC-1 through UC-6, passing 100% on GitHub Actions.
 
 ---
 
@@ -71,15 +71,31 @@ The implementation strictly conforms to the UML design specifications (full_clas
 * Apache Maven 3.8+ (or IntelliJ IDEA built-in Maven)
 
 ### Clone the Repository
+```bash
 git clone https://github.com/nguyenhoainam000/hotel-room-reservation-system.git
 cd hotel-room-reservation-system
+```
 
 ### Build & Run Tests
-# Compile and run all unit tests
+```bash
+# Compile and run all 20 automated unit tests
 mvn clean test
 
-# Run demo application
+# Run interactive console application
 mvn compile exec:java -Dexec.mainClass="org.example.Main"
+```
+
+### 🖥️ Interactive Console Menu Options
+When launched, `Main.java` provides an interactive menu:
+* `[1] View Available Rooms (UC-1)` - Lists all rooms currently vacant and available.
+* `[2] Search Rooms by Type & Location (UC-2)` - Searches with type/location criteria or blank wildcard.
+* `[3] Create Reservation (UC-3)` - Books room, validates guest name, generates confirmation.
+* `[4] Cancel Reservation (UC-4)` - Cancels booking and releases room inventory.
+* `[5] Trigger Cleaning Alert (UC-5)` - Simulates room checkout and maintenance request.
+* `[6] Generate Room Status Report (UC-6)` - Displays tabular report and occupancy statistics.
+* `[7] Run Automated Demo Sequence` - Runs an automated end-to-end walkthrough of all use cases.
+* `[8] Enter Interactive CLI Loop` - Prompts for continuous user commands.
+* `[0] Exit` - Terminates the application.
 
 ---
 
