@@ -57,8 +57,14 @@ public class HotelController {
     public List<Room> searchRooms(String type, String location) {
         return hotel.getRooms().stream()
                 .filter(Room::isAvailable)
-                .filter(r -> type == null || (r.getRoomType() != null && r.getRoomType().getName().equalsIgnoreCase(type)))
-                .filter(r -> location == null || r.getLocation().name().equalsIgnoreCase(location))
+                .filter(room -> type == null || type.isBlank()
+                        || (room.getRoomType() != null
+                        && room.getRoomType().getName() != null
+                        && room.getRoomType().getName().equalsIgnoreCase(type.trim())))
+                .filter(room -> location == null || location.isBlank()
+                        || room.getLocation().name().equalsIgnoreCase(location.trim())
+                        || room.getLocation().name().replace('_', ' ')
+                                .equalsIgnoreCase(location.trim()))
                 .collect(Collectors.toList());
     }
 
